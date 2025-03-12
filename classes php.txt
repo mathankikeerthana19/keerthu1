@@ -1,0 +1,166 @@
+<?php
+// Database connection
+$servername = "localhost"; // Replace with your server
+$username = "root"; // Replace with your MySQL username
+$password = ""; // Replace with your MySQL password
+$dbname = "dance_booking"; // Replace with your database name
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch all classes from the database
+$sql = "SELECT * FROM classes";
+$result = $conn->query($sql);
+
+// Close the database connection
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dance Classes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: rgb(167, 77, 216);
+            color: black;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* Classes container to hold all the class boxes */
+        .classes-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 columns per row */
+            gap: 15px;
+            padding: 10px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Style for each class box */
+        .class-box {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            transition: transform 0.3s;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .class-box:hover {
+            transform: translateY(-10px);
+        }
+
+        .class-box img {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .class-box h3 {
+            font-size: 20px;
+            color: rgb(167, 77, 216);
+            margin-top: 15px;
+        }
+
+        .class-box p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .class-box .level {
+            font-weight: bold;
+            color: rgb(169, 0, 230);
+        }
+
+        .class-box .duration {
+            font-size: 14px;
+            color: #444;
+        }
+
+        footer {
+            background-color: rgb(169, 0, 230);
+            color: black;
+            text-align: center;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to Our Dance Class Booking System</h1>
+        <nav>
+            <a href="index.html">Home</a> |
+            <a href="about.html">About</a> |
+            <a href="classes.php">Classes</a> |
+            <a href="booking.php">Booking</a> |
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+
+    <!-- Classes Section -->
+    <div class="classes-container">
+        <?php
+        // Check if there are any classes in the database
+        if ($result->num_rows > 0) {
+            // Output data for each class (Limit to 6 classes, 3 on the top and 3 below)
+            $counter = 0;
+            while ($row = $result->fetch_assoc()) {
+                if ($counter < 6) {
+                    echo '
+                        <div class="class-box">
+                            <img src="' . $row["image"] . '" alt="' . $row["name"] . ' Class">
+                            <h3>' . $row["name"] . '</h3>
+                            <p>' . $row["description"] . '</p>
+                            <p class="level">Level: ' . $row["level"] . '</p>
+                            <p class="duration"><strong>Duration:</strong> ' . $row["duration"] . '</p>
+                            <a href="booking.php?class_id=' . $row["id"] . '" class="button">Book Now</a>
+                        </div>
+                    ';
+                    $counter++;
+                }
+            }
+        } else {
+            echo "<p>No classes available.</p>";
+        }
+        ?>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Dance Class Booking System. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

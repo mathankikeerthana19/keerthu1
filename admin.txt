@@ -1,0 +1,28 @@
+ADMIN PAGE
+
+<?php
+// Database connection (Adjust this part with your actual database details)
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "dance_class_booking";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch all dance classes from the database
+$sql = "SELECT * FROM classes";
+$classesResult = $conn->query($sql);
+
+// Fetch all bookings from the database (if you want to display them here)
+$bookingSql = "SELECT * FROM registrations";
+$bookingsResult = $conn->query($bookingSql);
+
+// Close connection
+$conn->close();
+?>

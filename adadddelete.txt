@@ -1,0 +1,78 @@
+<?php
+// Start a session
+session_start();
+
+// Check if the admin is logged in, if not, redirect to login page
+
+// Include your database connection file
+include('db.php');
+
+// Fetch all the bookings
+$query_bookings = "SELECT * FROM bookings ORDER BY created_at DESC"; // Assuming created_at column exists
+$result_bookings = mysqli_query($conn, $query_bookings);
+if (!$result_bookings) {
+    die("Error fetching bookings: " . mysqli_error($conn));
+}
+
+// Fetch all the existing dance classes
+$query_classes = "SELECT * FROM dance_booking";
+$result_classes = mysqli_query($conn, $query_classes);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Dance Classes and Bookings</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Admin - Manage Dance Classes and Bookings</h1>
+        <nav>
+            <a href="index.php">Home</a> |
+            <a href="classes.php">Classes</a> |
+            <a href="admin.php">Admin</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>User Bookings</h2>
+        <?php if (mysqli_num_rows($result_bookings) > 0): ?>
+            <table border="1">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Age</th>
+                    <th>Dance Class</th>
+                    <th>Schedule</th>
+                    <th>Experience</th>
+                    <th>Date Registered</th>
+                </tr>
+                <?php while ($row = mysqli_fetch_assoc($result_bookings)): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($row['name']); ?></td>
+                        <td><?php echo htmlspecialchars($row['email']); ?></td>
+                        <td><?php echo htmlspecialchars($row['phone']); ?></td>
+                        <td><?php echo htmlspecialchars($row['age']); ?></td>
+                        <td><?php echo htmlspecialchars($row['dance_class']); ?></td>
+                        <td><?php echo htmlspecialchars($row['schedule']); ?></td>
+                        <td><?php echo nl2br(htmlspecialchars($row['experience'])); ?></td>
+                        <td><?php echo $row['created_at']; ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            </table>
+        <?php else: ?>
+            <p>No bookings available at the moment.</p>
+        <?php endif; ?>
+    </div>
+
+</body>
+</html>
+
+<?php
+// Close database connection
+mysqli_close($conn);
+?>

@@ -1,0 +1,152 @@
+<?php
+// Start session
+session_start();
+
+// Check if the user is logged in, if not redirect to login page
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header('Location: login.php');
+    exit();
+}
+
+// Include your database connection file
+include('db.php');
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Get and sanitize user inputs
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+    $age = (int) $_POST['age'];
+    $dance_class = mysqli_real_escape_string($conn, $_POST['dance_class']);
+    $schedule = mysqli_real_escape_string($conn, $_POST['schedule']);
+    $experience = mysqli_real_escape_string($conn, $_POST['experience']);
+
+    // Insert booking data into the database
+    $query = "INSERT INTO bookings (name, email, phone, age, dance_class, schedule, experience) 
+              VALUES ('$name', '$email', '$phone', $age, '$dance_class', '$schedule', '$experience')";
+
+    // Execute the query
+    if (mysqli_query($conn, $query)) {
+        $success_message = "Your booking has been successfully received! We will contact you shortly.";
+    } else {
+        $error_message = "Error: " . mysqli_error($conn);
+    }
+}
+
+// Close the database connection
+mysqli_close($conn);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Dance Class Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('dance.jpeg'); /* Add your background image URL here */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-size: 14px;
+            color: #555;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Register for Dance Class</h2>
+    <form action="booking.php" method="POST">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" required placeholder="Enter your full name">
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" value="<?php echo $_SESSION['email']; ?>" readonly required placeholder="Enter your email address">
+
+        <label for="phone">Phone Number</label>
+        <input type="text" id="phone" name="phone" required placeholder="Enter your phone number">
+
+        <label for="age">Age</label>
+        <input type="number" id="age" name="age" required placeholder="Enter your age">
+
+        <label for="dance_class">Preferred Dance Class</label>
+        <select id="dance_class" name="dance_class" required>
+            <option value="" disabled selected>Select your preferred class</option>
+            <option value="ballet">Ballet</option>
+            <option value="hiphop">Hip Hop</option>
+            <option value="jazz">Jazz</option>
+            <option value="salsa">Salsa</option>
+            <option value="contemporary">Contemporary</option>
+            <option value="tap">Tap Dance</option>
+        </select>
+
+        <label for="schedule">Preferred Schedule</label>
+        <select id="schedule" name="schedule" required>
+            <option value="" disabled selected>Select preferred time</option>
+            <option value="morning">Morning</option>
+            <option value="afternoon">Afternoon</option>
+            <option value="evening">Evening</option>
+        </select>
+
+        <label for="experience">Dance Experience</label>
+        <textarea id="experience" name="experience" rows="4" placeholder="Describe your dance experience (if any)"></textarea>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <!-- Display success or error message -->
+    <?php if (isset($success_message)): ?>
+        <div class="message" style="color: green;">
+            <p><?php echo $success_message; ?></p>
+        </div>
+    <?php elseif (isset($error_message)): ?>
+        <div class="message" style="color: red;">
+            <p><?php echo $error_message; ?></p>
+        </div>
+    <?php endif; ?>
+</div>
+
+</body>
+</html>

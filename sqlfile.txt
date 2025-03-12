@@ -1,0 +1,119 @@
+CREATE TABLE `classes` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL,
+    `description` TEXT,
+    `schedule` VARCHAR(255),
+    `price` DECIMAL(10, 2)
+);
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dance Classes - Dance Class Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+        }
+
+        header {
+            background-color: rgb(167, 77, 216);
+            color: black;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .main-content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .class-card {
+            display: inline-block;
+            width: 300px;
+            margin: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .class-card h3 {
+            color: rgb(167, 77, 216);
+            margin-bottom: 10px;
+        }
+
+        .class-card p {
+            color: #555;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .class-card .price {
+            font-weight: bold;
+            font-size: 18px;
+            color: rgb(169, 0, 230);
+        }
+
+        footer {
+            background-color: rgba(51, 51, 51, 0.8);
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to Our Dance Class Booking System</h1>
+        <nav>
+            <a href="index.php">Home</a> |
+            <a href="about.php">About</a> |
+            <a href="classes.php">Classes</a> |
+            <a href="booking.php">Booking</a> |
+            <a href="admin.php">Admin</a>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <h2>Our Dance Classes</h2>
+
+        <?php if (!empty($classes)): ?>
+            <div class="classes-list">
+                <?php foreach ($classes as $class): ?>
+                    <div class="class-card">
+                        <h3><?php echo htmlspecialchars($class['name']); ?></h3>
+                        <p><?php echo nl2br(htmlspecialchars($class['description'])); ?></p>
+                        <p><strong>Schedule:</strong> <?php echo htmlspecialchars($class['schedule']); ?></p>
+                        <p class="price">$<?php echo number_format($class['price'], 2); ?></p>
+                        <p><a href="booking.php?class_id=<?php echo $class['id']; ?>">Book Now</a></p>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <p>No classes available at the moment.</p>
+        <?php endif; ?>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Dance Class Booking System. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
+
