@@ -1,134 +1,88 @@
-<!---✅ Database table bookings must have a completed column
-sql
-Copy
-Edit
-ALTER TABLE bookings ADD COLUMN completed TINYINT(1) DEFAULT 0;
-✅ Admin marks student as completed by updating:
-sql
-Copy
-Edit
-UPDATE bookings SET completed = 1 WHERE id = [student_booking_id];
-✅ After completion, student visits certificate.php to download their certificate.
-✅ Print/Download as PDF by clicking the button (uses browser print-to-PDF).
-✅ Example Flow
-Student finishes the course.
-Admin marks completed = 1 for that student in the database.
-Student logs in and accesses certificate.php.
-Certificate displays with their name, course, and date.
-Student clicks Download/Print to save it.
-Would you like me to add: ✅ Admin "Mark Completed" button code?
-✅ Auto-generate PDF (PHP FPDF)?
-✅ Completion Date fetch from DB?
-
-Let me know if you want those next!---->
 <?php
-session_start();
-include('db.php'); // Include your database connection
+include('db.php'); // Database connection
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
-$user_id = $_SESSION['user_id'];
-
-// Fetch student booking and completion status
-$query = "SELECT * FROM bookings WHERE id = '$user_id' LIMIT 1";
+// Fetch all students' booking and certificate status
+$query = "SELECT * FROM bookings";
 $result = mysqli_query($conn, $query);
-
-if ($result && mysqli_num_rows($result) > 0) {
-    $student = mysqli_fetch_assoc($result);
-    
-    if ($student['completed'] == 1) {
-        $student_name = htmlspecialchars($student['name']);
-        $class_name = htmlspecialchars($student['dance_class']);
-        $completion_date = date("d-m-Y"); // You can fetch actual completion date if stored
-    } else {
-        echo "<h2>You have not completed the course yet!</h2>";
-        exit();
-    }
-} else {
-    echo "<h2>Booking not found!</h2>";
-    exit();
-}
-
-mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Certificate of Completion</title>
+    <title>Certificates</title>
     <style>
         body {
-            background-color: #f9f9f9;
-            font-family: 'Georgia', serif;
+            font-family: Arial, sans-serif;
+            background-color: #f1f1f1;
+            padding: 20px;
+        }
+        h2 {
             text-align: center;
-            padding: 50px;
-        }
-        .certificate {
-            border: 10px solid #6a1b9a;
-            padding: 50px;
-            background-color: #fff;
-            width: 80%;
-            margin: auto;
-            border-radius: 20px;
-        }
-        h1 {
             color: #6a1b9a;
-            font-size: 50px;
         }
-        .student-name {
-            font-size: 35px;
-            margin: 20px 0;
-            color: #333;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
         }
-        .course-name {
-            font-size: 30px;
-            margin: 20px 0;
-            color: #555;
+        th, td {
+            padding: 15px;
+            border: 1px solid #ddd;
+            text-align: center;
         }
-        .date {
-            font-size: 20px;
-            color: #777;
-            margin-top: 30px;
-        }
-        .signature {
-            margin-top: 50px;
-            font-size: 18px;
-            color: #333;
-        }
-        button {
-            margin-top: 30px;
-            padding: 15px 30px;
-            font-size: 18px;
+        th {
             background-color: #6a1b9a;
             color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
         }
-        button:hover {
+        .btn {
+            padding: 8px 15px;
+            background-color: #6a1b9a;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn:hover {
             background-color: #4a0072;
         }
     </style>
 </head>
 <body>
 
-    <div class="certificate">
-        <h1>Certificate of Completion</h1>
-        <p>This is to certify that</p>
-        <div class="student-name"><?php echo $student_name; ?></div>
-        <p>has successfully completed the course</p>
-        <div class="course-name"><?php echo $class_name; ?></div>
-        <div class="date">Date: <?php echo $completion_date; ?></div>
+<h2>Student Certificates</h2>
 
-        <div class="signature">Instructor Signature</div>
-    </div>
+<table>
+    <tr>
+        <th>Student Name</th>
+        <th>Dance Class</th>
+        <th>Certificate Status</th>
+        <th>Action</th>
+    </tr>
 
-    <button onclick="window.print()">Download / Print Certificate</button>
+    <?php
+    if (mysqli_num_rows($result) > 0) {
+        while ($student = mysqli_fetch_assoc($result)) {
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($student['name']) . "</td>";
+            echo "<td>" . htmlspecialchars($student['dance_class']) . "</td>";
+            echo "<td>" . htmlspecialchars(ucfirst($student['certificate_status'])) . "</td>";
+
+            if (strtolower($student['certificate_status']) == 'approved') {
+
+                echo "<td><a class='btn' href='generate_certificate.php?id=" . $student['id'] . "' target='_blank'>View / Download</a></td>";
+            } else {
+                echo "<td>Pending Approval</td>";
+            }
+
+            echo "</tr>";
+        }
+    } else {
+        echo "<tr><td colspan='4'>No student data found.</td></tr>";
+    }
+    ?>
+</table>
 
 </body>
 </html>
+
+<?php mysqli_close($conn); ?>
