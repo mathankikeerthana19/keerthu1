@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phone = mysqli_real_escape_string($conn, $_POST['phone']);
     $age = (int) $_POST['age'];
     $dance_class = mysqli_real_escape_string($conn, $_POST['dance_class']);
-    $schedule = mysqli_real_escape_string($conn, $_POST['schedule']);
+   
     $experience = mysqli_real_escape_string($conn, $_POST['experience']);
 
     // Fetch the correct fees and timing from the database based on the selected dance class
@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $timing = $row['timing']; // Get timing from the database
 
         // Insert booking data into the database
-        $insert_query = "INSERT INTO bookings (name, email, phone, age, dance_class, schedule, experience, fees, timing) 
-                         VALUES ('$name', '$email', '$phone', $age, '$dance_class', '$schedule', '$experience', $fees, '$timing')";
+        $insert_query = "INSERT INTO bookings (name, email, phone, age, dance_class,  experience, fees, timing) 
+                         VALUES ('$name', '$email', '$phone', $age, '$dance_class',  '$experience', $fees, '$timing')";
 
         if (mysqli_query($conn, $insert_query)) {
             $success_message = "Your booking has been successfully received! We will contact you shortly.";
@@ -109,7 +109,7 @@ mysqli_close($conn);
 
 <div class="form-container">
     <h2>Register for Dance Class</h2>
-    <form action="booking.php" method="POST">
+    <form action="payment.php" method="POST">
         <label for="name">Full Name</label>
         <input type="text" id="name" name="name" required placeholder="Enter your full name">
 
@@ -144,7 +144,7 @@ mysqli_close($conn);
         <label for="timing">Class Timing</label>
         <input type="text" id="timing" name="timing" readonly> <!-- Readonly field for timing -->
 
-        <button type="submit">Register</button>
+          <button type="submit" class="register-btn">Register & Pay</button>
     </form>
     <?php if ($success_message): ?>
         <div class="message" style="color: green;">
